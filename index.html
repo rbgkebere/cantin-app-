@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🍽️ Calcul Cantine - Lunch 1500 F</title>
-    <style> 
+    <style>
         * {
             box-sizing: border-box;
             margin: 0;
@@ -32,7 +32,6 @@
             padding: 32px 28px;
             box-shadow: 0 30px 50px rgba(0, 0, 0, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            transition: transform 0.2s ease;
         }
 
         h1 {
@@ -103,7 +102,6 @@
 
         select:hover, input[type="number"]:hover {
             border-color: #f97316;
-            background-color: #1e2b3c;
         }
 
         select:focus, input[type="number"]:focus {
@@ -189,16 +187,6 @@
             letter-spacing: 0;
         }
 
-        .fcfa-badge {
-            background: #0f1a26;
-            padding: 6px 14px;
-            border-radius: 40px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: #94a3b8;
-            border: 1px solid #334155;
-        }
-
         .error-msg {
             color: #f87171;
             font-size: 0.9rem;
@@ -214,7 +202,6 @@
             color: #64748b;
         }
 
-        /* Petite animation */
         @keyframes pop {
             0% { transform: scale(0.95); opacity: 0.6; }
             100% { transform: scale(1); opacity: 1; }
@@ -245,11 +232,11 @@
             <div class="row">
                 <div class="field">
                     <label>Du jour</label>
-                    <input type="number" id="startDay" min="1" max="31" value="1" step="1">
+                    <select id="startDay"></select>
                 </div>
                 <div class="field">
                     <label>Au jour</label>
-                    <input type="number" id="endDay" min="1" max="31" value="15" step="1">
+                    <select id="endDay"></select>
                 </div>
             </div>
 
@@ -281,8 +268,8 @@
         (function() {
             const monthSelect = document.getElementById('monthSelect');
             const yearInput = document.getElementById('yearInput');
-            const startDayInput = document.getElementById('startDay');
-            const endDayInput = document.getElementById('endDay');
+            const startDaySelect = document.getElementById('startDay');
+            const endDaySelect = document.getElementById('endDay');
             const calcBtn = document.getElementById('calcBtn');
             const resultContainer = document.getElementById('resultContainer');
             const daysCountSpan = document.getElementById('daysCount');
@@ -294,78 +281,71 @@
                 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
             ];
 
+            const PRIX = 1500;
+
             // Remplir les mois
             MOIS.forEach((nom, index) => {
                 const option = document.createElement('option');
-                option.value = index; // 0 = Janvier
+                option.value = index;
                 option.textContent = nom;
                 monthSelect.appendChild(option);
             });
             monthSelect.value = 2; // Mars par défaut
 
-            // Prix unitaire
-            const PRIX = 1500;
-
-            // Fonction utilitaire : nombre de jours dans un mois
-            function daysInMonth(month, year) {
-                return new Date(year, month + 1, 0).getDate();
+            // Remplir les jours (1 à 31)
+            function fillDays(selectElement, defaultVal) {
+                selectElement.innerHTML = '';
+                for (let i = 1; i <= 31; i++) {
+                    const option = document.createElement('option');
+                    option.value = i;
+                    option.textContent = i;
+                    selectElement.appendChild(option);
+                }
+                selectElement.value = defaultVal;
             }
+            fillDays(startDaySelect, 1);
+            fillDays(endDaySelect, 15);
 
-            // Validation des jours saisis en fonction du mois
-            function clampDayInputs() {
+            // Ajuster les jours selon le mois (28, 29, 30, 31)
+            function adjustDaysInMonth() {
                 const month = parseInt(monthSelect.value, 10);
                 const year = parseInt(yearInput.value, 10);
                 if (isNaN(year) || year < 1) return;
 
-                const maxDay = daysInMonth(month, year);
-                [startDayInput, endDayInput].forEach(input => {
-                    let val = parseInt(input.value, 10);
-                    if (isNaN(val) || val < 1) val = 1;
-                    if (val > maxDay) val = maxDay;
-                    input.value = val;
-                    input.max = maxDay;
+                const maxDay = new Date(year, month + 1, 0).getDate();
+
+                // Mettre à jour les options disponibles
+                [startDaySelect, endDaySelect].forEach(select => {
+                    const currentVal = parseInt(select.value, 10);
+                    select.innerHTML = '';
+                    for (let i = 1; i <= maxDay; i++) {
+                        const option = document.createElement('option');
+                        option.value = i;
+                        option.textContent = i;
+                        select.appendChild(option);
+                    }
+                    // Restaurer la valeur si possible, sinon prendre la dernière
+                    select.value = Math.min(currentVal, maxDay);
                 });
             }
 
-            // Écouter les changements de mois/année pour ajuster les jours max
-            monthSelect.addEventListener('change', clampDayInputs);
-            yearInput.addEventListener('input', clampDayInputs);
-            startDayInput.addEventListener('input', () => {
-                let val = parseInt(startDayInput.value, 10);
-                if (!isNaN(val) && val > 31) startDayInput.value = 31;
-            });
-            endDayInput.addEventListener('input', () => {
-                let val = parseInt(endDayInput.value, 10);
-                if (!isNaN(val) && val > 31) endDayInput.value = 31;
-            });
+            monthSelect.addEventListener('change', adjustDaysInMonth);
+            yearInput.addEventListener('input', adjustDaysInMonth);
 
             // Calcul principal
             function calculer() {
                 errorMsg.textContent = '';
                 resultContainer.style.display = 'none';
 
-                const month = parseInt(monthSelect.value, 10); // 0-11
+                const month = parseInt(monthSelect.value, 10);
                 const year = parseInt(yearInput.value, 10);
-                let startDay = parseInt(startDayInput.value, 10);
-                let endDay = parseInt(endDayInput.value, 10);
+                const startDay = parseInt(startDaySelect.value, 10);
+                const endDay = parseInt(endDaySelect.value, 10);
 
-                // Validations de base
                 if (isNaN(year) || year < 1900 || year > 2200) {
                     errorMsg.textContent = 'Veuillez entrer une année valide (1900–2200).';
                     return;
                 }
-                if (isNaN(startDay) || isNaN(endDay)) {
-                    errorMsg.textContent = 'Veuillez entrer des jours valides.';
-                    return;
-                }
-
-                const maxDay = daysInMonth(month, year);
-                if (startDay < 1) startDay = 1;
-                if (endDay > maxDay) endDay = maxDay;
-
-                // Correction automatique des champs
-                startDayInput.value = startDay;
-                endDayInput.value = endDay;
 
                 if (startDay > endDay) {
                     errorMsg.textContent = 'Le jour de début doit être inférieur ou égal au jour de fin.';
@@ -384,7 +364,6 @@
 
                 const total = joursOuvres * PRIX;
 
-                // Affichage
                 daysCountSpan.textContent = joursOuvres;
                 totalAmountSpan.textContent = total.toLocaleString('fr-FR') + ' FCFA';
                 resultContainer.style.display = 'block';
@@ -392,22 +371,10 @@
                 setTimeout(() => resultContainer.classList.remove('animate-pop'), 300);
             }
 
-            // Événements
             calcBtn.addEventListener('click', calculer);
 
-            // Permettre la touche Entrée
-            [monthSelect, yearInput, startDayInput, endDayInput].forEach(el => {
-                el.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        calculer();
-                    }
-                });
-            });
-
             // Initialisation
-            clampDayInputs();
-            // Petit calcul automatique au chargement pour montrer un exemple
+            adjustDaysInMonth();
             setTimeout(calculer, 100);
         })();
     </script>
