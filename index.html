@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🍽️ Calcul Cantine - Lunch 1500 F</title>
+    <style> 
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(145deg, #1e2b3c 0%, #0f1a26 100%);
+            padding: 16px;
+            margin: 0;
+        }
+
+        .card {
+            max-width: 560px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 48px;
+            padding: 32px 28px;
+            box-shadow: 0 30px 50px rgba(0, 0, 0, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: transform 0.2s ease;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .subhead {
+            color: #94a3b8;
+            font-size: 0.95rem;
+            margin-bottom: 28px;
+            border-left: 4px solid #f97316;
+            padding-left: 16px;
+            font-weight: 400;
+        }
+
+        .form-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .row {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .field {
+            flex: 1 1 140px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 500;
+            color: #94a3b8;
+            margin-left: 4px;
+        }
+
+        select, input[type="number"] {
+            background: #1e2b3c;
+            border: 1.5px solid #334155;
+            border-radius: 20px;
+            padding: 14px 18px;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #f1f5f9;
+            outline: none;
+            transition: all 0.2s;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            background-size: 18px;
+        }
+
+        select:hover, input[type="number"]:hover {
+            border-color: #f97316;
+            background-color: #1e2b3c;
+        }
+
+        select:focus, input[type="number"]:focus {
+            border-color: #f97316;
+            box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.2);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #f97316, #ea580c);
+            border: none;
+            border-radius: 40px;
+            padding: 18px 24px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 12px 20px -8px rgba(249, 115, 22, 0.4);
+            margin-top: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            background: linear-gradient(135deg, #fb923c, #f97316);
+            transform: scale(1.01);
+            box-shadow: 0 16px 26px -8px rgba(249, 115, 22, 0.6);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .result-box {
+            margin-top: 30px;
+            background: rgba(249, 115, 22, 0.12);
+            border-radius: 28px;
+            padding: 24px 22px;
+            border: 1px solid rgba(249, 115, 22, 0.3);
+            backdrop-filter: blur(4px);
+            transition: all 0.3s ease;
+        }
+
+        .result-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.05rem;
+            color: #cbd5e1;
+            padding: 8px 0;
+            border-bottom: 1px dashed #334155;
+        }
+
+        .result-line:last-child {
+            border-bottom: none;
+        }
+
+        .result-line strong {
+            color: #f1f5f9;
+            font-weight: 600;
+        }
+
+        .total-line {
+            margin-top: 10px;
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #f97316;
+            justify-content: space-between;
+            display: flex;
+            align-items: center;
+            border-top: 2px solid rgba(249, 115, 22, 0.3);
+            padding-top: 18px;
+            letter-spacing: -0.5px;
+        }
+
+        .total-line span:first-child {
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #94a3b8;
+            letter-spacing: 0;
+        }
+
+        .fcfa-badge {
+            background: #0f1a26;
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #94a3b8;
+            border: 1px solid #334155;
+        }
+
+        .error-msg {
+            color: #f87171;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            text-align: center;
+            min-height: 22px;
+        }
+
+        .footer-note {
+            margin-top: 18px;
+            font-size: 0.8rem;
+            text-align: center;
+            color: #64748b;
+        }
+
+        /* Petite animation */
+        @keyframes pop {
+            0% { transform: scale(0.95); opacity: 0.6; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .animate-pop {
+            animation: pop 0.25s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🍽️ Cantine</h1>
+        <div class="subhead">Calculez ce que vous devez au responsable — 1 500 F par lunch (lundi → vendredi)</div>
+
+        <div class="form-grid">
+            <div class="row">
+                <div class="field">
+                    <label>Mois</label>
+                    <select id="monthSelect"></select>
+                </div>
+                <div class="field">
+                    <label>Année</label>
+                    <input type="number" id="yearInput" min="2020" max="2100" value="2026" step="1">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="field">
+                    <label>Du jour</label>
+                    <input type="number" id="startDay" min="1" max="31" value="1" step="1">
+                </div>
+                <div class="field">
+                    <label>Au jour</label>
+                    <input type="number" id="endDay" min="1" max="31" value="15" step="1">
+                </div>
+            </div>
+
+            <button class="btn" id="calcBtn">
+                💰 Calculer la somme
+            </button>
+        </div>
+
+        <div id="resultContainer" class="result-box" style="display: none;">
+            <div class="result-line">
+                <span>📅 Jours ouvrés (lun–ven)</span>
+                <strong id="daysCount">0</strong>
+            </div>
+            <div class="result-line">
+                <span>🍛 Prix par lunch</span>
+                <strong>1 500 FCFA</strong>
+            </div>
+            <div class="total-line">
+                <span>Total à payer</span>
+                <span id="totalAmount">0 FCFA</span>
+            </div>
+        </div>
+
+        <div id="errorMsg" class="error-msg"></div>
+        <div class="footer-note">Les samedis et dimanches ne sont pas comptés.</div>
+    </div>
+
+    <script>
+        (function() {
+            const monthSelect = document.getElementById('monthSelect');
+            const yearInput = document.getElementById('yearInput');
+            const startDayInput = document.getElementById('startDay');
+            const endDayInput = document.getElementById('endDay');
+            const calcBtn = document.getElementById('calcBtn');
+            const resultContainer = document.getElementById('resultContainer');
+            const daysCountSpan = document.getElementById('daysCount');
+            const totalAmountSpan = document.getElementById('totalAmount');
+            const errorMsg = document.getElementById('errorMsg');
+
+            const MOIS = [
+                'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+                'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
+            ];
+
+            // Remplir les mois
+            MOIS.forEach((nom, index) => {
+                const option = document.createElement('option');
+                option.value = index; // 0 = Janvier
+                option.textContent = nom;
+                monthSelect.appendChild(option);
+            });
+            monthSelect.value = 2; // Mars par défaut
+
+            // Prix unitaire
+            const PRIX = 1500;
+
+            // Fonction utilitaire : nombre de jours dans un mois
+            function daysInMonth(month, year) {
+                return new Date(year, month + 1, 0).getDate();
+            }
+
+            // Validation des jours saisis en fonction du mois
+            function clampDayInputs() {
+                const month = parseInt(monthSelect.value, 10);
+                const year = parseInt(yearInput.value, 10);
+                if (isNaN(year) || year < 1) return;
+
+                const maxDay = daysInMonth(month, year);
+                [startDayInput, endDayInput].forEach(input => {
+                    let val = parseInt(input.value, 10);
+                    if (isNaN(val) || val < 1) val = 1;
+                    if (val > maxDay) val = maxDay;
+                    input.value = val;
+                    input.max = maxDay;
+                });
+            }
+
+            // Écouter les changements de mois/année pour ajuster les jours max
+            monthSelect.addEventListener('change', clampDayInputs);
+            yearInput.addEventListener('input', clampDayInputs);
+            startDayInput.addEventListener('input', () => {
+                let val = parseInt(startDayInput.value, 10);
+                if (!isNaN(val) && val > 31) startDayInput.value = 31;
+            });
+            endDayInput.addEventListener('input', () => {
+                let val = parseInt(endDayInput.value, 10);
+                if (!isNaN(val) && val > 31) endDayInput.value = 31;
+            });
+
+            // Calcul principal
+            function calculer() {
+                errorMsg.textContent = '';
+                resultContainer.style.display = 'none';
+
+                const month = parseInt(monthSelect.value, 10); // 0-11
+                const year = parseInt(yearInput.value, 10);
+                let startDay = parseInt(startDayInput.value, 10);
+                let endDay = parseInt(endDayInput.value, 10);
+
+                // Validations de base
+                if (isNaN(year) || year < 1900 || year > 2200) {
+                    errorMsg.textContent = 'Veuillez entrer une année valide (1900–2200).';
+                    return;
+                }
+                if (isNaN(startDay) || isNaN(endDay)) {
+                    errorMsg.textContent = 'Veuillez entrer des jours valides.';
+                    return;
+                }
+
+                const maxDay = daysInMonth(month, year);
+                if (startDay < 1) startDay = 1;
+                if (endDay > maxDay) endDay = maxDay;
+
+                // Correction automatique des champs
+                startDayInput.value = startDay;
+                endDayInput.value = endDay;
+
+                if (startDay > endDay) {
+                    errorMsg.textContent = 'Le jour de début doit être inférieur ou égal au jour de fin.';
+                    return;
+                }
+
+                // Compter les jours ouvrés (lundi=1 ... vendredi=5)
+                let joursOuvres = 0;
+                for (let d = startDay; d <= endDay; d++) {
+                    const date = new Date(year, month, d);
+                    const jourSemaine = date.getDay(); // 0 = dimanche, 6 = samedi
+                    if (jourSemaine !== 0 && jourSemaine !== 6) {
+                        joursOuvres++;
+                    }
+                }
+
+                const total = joursOuvres * PRIX;
+
+                // Affichage
+                daysCountSpan.textContent = joursOuvres;
+                totalAmountSpan.textContent = total.toLocaleString('fr-FR') + ' FCFA';
+                resultContainer.style.display = 'block';
+                resultContainer.classList.add('animate-pop');
+                setTimeout(() => resultContainer.classList.remove('animate-pop'), 300);
+            }
+
+            // Événements
+            calcBtn.addEventListener('click', calculer);
+
+            // Permettre la touche Entrée
+            [monthSelect, yearInput, startDayInput, endDayInput].forEach(el => {
+                el.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        calculer();
+                    }
+                });
+            });
+
+            // Initialisation
+            clampDayInputs();
+            // Petit calcul automatique au chargement pour montrer un exemple
+            setTimeout(calculer, 100);
+        })();
+    </script>
+</body>
+</html>
