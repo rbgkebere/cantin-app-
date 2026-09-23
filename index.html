@@ -225,7 +225,7 @@
                 </div>
                 <div class="field">
                     <label>Année</label>
-                    <input type="number" id="yearInput" min="2020" max="2100" value="2026" step="1">
+                    <input type="number" id="yearInput" min="2020" max="2100" step="1">
                 </div>
             </div>
 
@@ -290,7 +290,6 @@
                 option.textContent = nom;
                 monthSelect.appendChild(option);
             });
-            monthSelect.value = 2; // Mars par défaut
 
             // Remplir les jours (1 à 31)
             function fillDays(selectElement, defaultVal) {
@@ -303,8 +302,6 @@
                 }
                 selectElement.value = defaultVal;
             }
-            fillDays(startDaySelect, 1);
-            fillDays(endDaySelect, 15);
 
             // Ajuster les jours selon le mois (28, 29, 30, 31)
             function adjustDaysInMonth() {
@@ -314,7 +311,6 @@
 
                 const maxDay = new Date(year, month + 1, 0).getDate();
 
-                // Mettre à jour les options disponibles
                 [startDaySelect, endDaySelect].forEach(select => {
                     const currentVal = parseInt(select.value, 10);
                     select.innerHTML = '';
@@ -324,7 +320,6 @@
                         option.textContent = i;
                         select.appendChild(option);
                     }
-                    // Restaurer la valeur si possible, sinon prendre la dernière
                     select.value = Math.min(currentVal, maxDay);
                 });
             }
@@ -352,11 +347,10 @@
                     return;
                 }
 
-                // Compter les jours ouvrés (lundi=1 ... vendredi=5)
                 let joursOuvres = 0;
                 for (let d = startDay; d <= endDay; d++) {
                     const date = new Date(year, month, d);
-                    const jourSemaine = date.getDay(); // 0 = dimanche, 6 = samedi
+                    const jourSemaine = date.getDay();
                     if (jourSemaine !== 0 && jourSemaine !== 6) {
                         joursOuvres++;
                     }
@@ -373,8 +367,27 @@
 
             calcBtn.addEventListener('click', calculer);
 
-            // Initialisation
+            // === INITIALISATION AVEC LA DATE DU JOUR ===
+            const today = new Date();
+            const currentMonth = today.getMonth();      // 0 = Janvier
+            const currentYear = today.getFullYear();
+            const currentDay = today.getDate();
+
+            // Mois et année actuels
+            monthSelect.value = currentMonth;
+            yearInput.value = currentYear;
+
+            // Remplir les jours en fonction du mois actuel
+            fillDays(startDaySelect, 1);
+            fillDays(endDaySelect, 1);
             adjustDaysInMonth();
+
+            // Mettre le jour de début au 1er et le jour de fin au dernier jour du mois
+            const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            startDaySelect.value = 1;
+            endDaySelect.value = lastDayOfMonth;
+
+            // Calcul automatique au chargement
             setTimeout(calculer, 100);
         })();
     </script>
